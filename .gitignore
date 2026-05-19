@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploaded files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Error dumps
+frontend/build_error.log
+frontend/build_error_vite.log
+frontend/error_utf8.txt
+frontend/error_vite_utf8.txt
+frontend/ts_errors.log
+frontend/ts_errors_utf8.txt
