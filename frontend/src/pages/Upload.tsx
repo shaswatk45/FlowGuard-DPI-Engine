@@ -17,6 +17,8 @@ export function Upload() {
     const { setAnalytics } = useAnalytics();
     const navigate = useNavigate();
 
+    const [lockdownState, setLockdownState] = useState<'idle' | 'initiating' | 'active'>('idle');
+
     const handleStartAnalysis = async () => {
         if (!file) return;
         setIsProcessing(true);
@@ -58,6 +60,25 @@ export function Upload() {
         }
     };
 
+    const handleLockdown = () => {
+        if (lockdownState !== 'idle') return;
+        setLockdownState('initiating');
+        
+        setLogs(prev => [
+            ...prev,
+            { id: `ld-${Date.now()}-1`, time: new Date().toISOString().slice(11, 19), level: 'warn', message: '⚠️ INITIATING SYSTEM LOCKDOWN...' },
+            { id: `ld-${Date.now()}-2`, time: new Date().toISOString().slice(11, 19), level: 'warn', message: 'Isolating node 0x8F9A2 (FRANKFURT_DC)...' }
+        ]);
+        
+        setTimeout(() => {
+            setLogs(prev => [
+                ...prev,
+                { id: `ld-${Date.now()}-3`, time: new Date().toISOString().slice(11, 19), level: 'error', message: '🚨 NODE ISOLATED. ALL INBOUND TRAFFIC BLOCKED.' }
+            ]);
+            setLockdownState('active');
+        }, 1500);
+    };
+
 
     return (
         <div className="flex flex-col xl:flex-row gap-12 w-full mt-4">
@@ -94,8 +115,15 @@ export function Upload() {
                             </div>
                         </div>
 
-                        <PillButton variant="danger" className="w-full mt-auto mb-12 h-16 shadow-[0_10px_30px_rgba(255,77,79,0.3)]">
-                            INITIATE LOCKDOWN 🔒
+                        <PillButton 
+                            variant="danger" 
+                            className="w-full mt-auto mb-12 h-16 shadow-[0_10px_30px_rgba(255,77,79,0.3)] transition-all"
+                            onClick={handleLockdown}
+                            disabled={lockdownState !== 'idle'}
+                        >
+                            {lockdownState === 'idle' ? 'INITIATE LOCKDOWN 🔒' : 
+                             lockdownState === 'initiating' ? 'LOCKING DOWN...' : 
+                             'SYSTEM LOCKED 🛑'}
                         </PillButton>
                     </div>
                 </SlantedPanel>
