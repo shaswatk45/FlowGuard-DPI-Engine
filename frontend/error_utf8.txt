@@ -1,0 +1,113 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 26 modules transformed.
+node.exe : 
+[31mΓ£ù[39m Build 
+failed in 2.92s
+At C:\Program Files\no
+dejs\npx.ps1:29 char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([31mΓ£ù[   
+ 39m Build failed     
+in 2.92s:String)     
+[], RemoteExcepti    
+on
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+[31merror during 
+build:
+[31m[vite:css] 
+[postcss] It looks 
+like you're trying to 
+use `tailwindcss` 
+directly as a PostCSS 
+plugin. The PostCSS 
+plugin has moved to a 
+separate package, so 
+to continue using 
+Tailwind CSS with 
+PostCSS you'll need 
+to install `@tailwindc
+ss/postcss` and 
+update your PostCSS 
+configuration.[31m
+file: [36mC:/Users/91
+953/OneDrive/Desktop/D
+PI/Packet_analyzer/fro
+ntend/src/index.css:un
+defined:NaN[31m
+    at at (C:\Users\91
+953\OneDrive\Desktop\D
+PI\Packet_analyzer\fro
+ntend\node_modules\tai
+lwindcss\dist\lib.js:3
+8:1643)
+    at 
+LazyResult.runOnRoot (
+C:\Users\91953\OneDriv
+e\Desktop\DPI\Packet_a
+nalyzer\frontend\node_
+modules\postcss\lib\la
+zy-result.js:361:16)
+    at 
+LazyResult.runAsync (C
+:\Users\91953\OneDrive
+\Desktop\DPI\Packet_an
+alyzer\frontend\node_m
+odules\postcss\lib\laz
+y-result.js:290:26)
+    at async 
+runPostCSS (file:///C:
+/Users/91953/OneDrive/
+Desktop/DPI/Packet_ana
+lyzer/frontend/node_mo
+dules/vite/dist/node/c
+hunks/config.js:30145:
+19)
+    at async 
+compilePostCSS (file:/
+//C:/Users/91953/OneDr
+ive/Desktop/DPI/Packet
+_analyzer/frontend/nod
+e_modules/vite/dist/no
+de/chunks/config.js:30
+129:6)
+    at async 
+compileCSS (file:///C:
+/Users/91953/OneDrive/
+Desktop/DPI/Packet_ana
+lyzer/frontend/node_mo
+dules/vite/dist/node/c
+hunks/config.js:30059:
+26)
+    at async 
+Object.handler (file:/
+//C:/Users/91953/OneDr
+ive/Desktop/DPI/Packet
+_analyzer/frontend/nod
+e_modules/vite/dist/no
+de/chunks/config.js:29
+592:54)
+    at async 
+transform (file:///C:/
+Users/91953/OneDrive/D
+esktop/DPI/Packet_anal
+yzer/frontend/node_mod
+ules/rollup/dist/es/sh
+ared/node-entry.js:212
+69:16)
+    at async ModuleLoa
+der.addModuleSource (f
+ile:///C:/Users/91953/
+OneDrive/Desktop/DPI/P
+acket_analyzer/fronten
+d/node_modules/rollup/
+dist/es/shared/node-en
+try.js:21497:36)[39m

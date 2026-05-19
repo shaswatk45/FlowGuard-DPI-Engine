@@ -1,0 +1,85 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 3 modules transformed.
+node.exe : [31mΓ£ù[39m 
+Build failed in 151ms
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([31mΓ£  
+  ù[39m Build failed in 1   
+ 51ms:String) [], RemoteE    
+xception
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[31merror during build:
+[31m[@tailwindcss/vite:gener
+ate:build] Cannot apply 
+unknown utility class 
+`bg-page`. Are you using CSS 
+modules or similar and 
+missing `@reference`? https:/
+/tailwindcss.com/docs/functio
+ns-and-directives#reference-d
+irective[31m
+file: [36mC:/Users/91953/One
+Drive/Desktop/DPI/Packet_anal
+yzer/frontend/src/index.css[
+31m
+    at onInvalidCandidate (fi
+le:///C:/Users/91953/OneDrive
+/Desktop/DPI/Packet_analyzer/
+frontend/node_modules/tailwin
+dcss/dist/chunk-L5IEUH3R.mjs:
+21:1314)
+    at $e (file:///C:/Users/9
+1953/OneDrive/Desktop/DPI/Pac
+ket_analyzer/frontend/node_mo
+dules/tailwindcss/dist/chunk-
+L5IEUH3R.mjs:16:37066)
+    at file:///C:/Users/91953
+/OneDrive/Desktop/DPI/Packet_
+analyzer/frontend/node_module
+s/tailwindcss/dist/chunk-L5IE
+UH3R.mjs:21:355
+    at Ar (file:///C:/Users/9
+1953/OneDrive/Desktop/DPI/Pac
+ket_analyzer/frontend/node_mo
+dules/tailwindcss/dist/chunk-
+L5IEUH3R.mjs:3:1733)
+    at I (file:///C:/Users/91
+953/OneDrive/Desktop/DPI/Pack
+et_analyzer/frontend/node_mod
+ules/tailwindcss/dist/chunk-L
+5IEUH3R.mjs:3:1377)
+    at Ce (file:///C:/Users/9
+1953/OneDrive/Desktop/DPI/Pac
+ket_analyzer/frontend/node_mo
+dules/tailwindcss/dist/chunk-
+L5IEUH3R.mjs:21:172)
+    at Gi (file:///C:/Users/9
+1953/OneDrive/Desktop/DPI/Pac
+ket_analyzer/frontend/node_mo
+dules/tailwindcss/dist/chunk-
+L5IEUH3R.mjs:38:294)
+    at async ao (file:///C:/U
+sers/91953/OneDrive/Desktop/D
+PI/Packet_analyzer/frontend/n
+ode_modules/tailwindcss/dist/
+chunk-L5IEUH3R.mjs:38:631)
+    at async vf (file:///C:/U
+sers/91953/OneDrive/Desktop/D
+PI/Packet_analyzer/frontend/n
+ode_modules/tailwindcss/dist/
+chunk-L5IEUH3R.mjs:38:1406)
+    at async uu (file:///C:/U
+sers/91953/OneDrive/Desktop/D
+PI/Packet_analyzer/frontend/n
+ode_modules/@tailwindcss/node
+/dist/index.mjs:10:3458)[39m

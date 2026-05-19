@@ -1,0 +1,8 @@
+﻿src/components/FlowTable.tsx(2,21): error TS1484: 'SignalColor' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/MetricCard.tsx(1,1): error TS6133: 'ReactNode' is declared but its value is never read.
+src/components/MetricCard.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/MetricCard.tsx(4,10): error TS1484: 'SignalColor' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/PillButton.tsx(1,10): error TS1484: 'ButtonHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/layout/MainLayout.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Rules.tsx(2,20): error TS1484: 'Rule' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Traffic.tsx(2,21): error TS1484: 'FlowRecord' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.

@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-page: #050505;
+    --bg-sidebar: #050505;
+    --bg-card: #0d0d0d;
+    --bg-card-alt: #161616;
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.15);
+    --border-focus: #2b8cee;
+
+    --signal-allow: #00e676;
+    --signal-block: #ff4d4f;
+    --signal-warn: #ffb347;
+    --signal-info: #00c8ff;
+    --signal-purple: #9b59fc;
+    --signal-disabled: #4a5260;
+
+    --accent-blue: #4B8DFF;
+    --accent-blue-hover: #3a75e6;
+
+    --gradient-hero: linear-gradient(135deg, #161616 0%, #0d0d0d 100%);
+    --gradient-cta: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  }
+
+  body {
+    @apply font-sans antialiased;
+    color: #A0A4A8;
+    /* Body text color fallback */
+    background-color: var(--bg-page);
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
