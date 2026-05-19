@@ -7,7 +7,6 @@
 #include <chrono>
 #include <vector>
 #include <atomic>
-#include <optional>
 
 namespace DPI {
 

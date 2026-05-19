@@ -3,7 +3,6 @@
 
 #include <string>
 #include <cstdint>
-#include <optional>
 #include <vector>
 
 namespace DPI {
@@ -47,7 +46,7 @@ class SNIExtractor {
 public:
     // Extract SNI from a TLS Client Hello packet
     // payload should point to the start of TCP payload (after TCP header)
-    static std::optional<std::string> extract(const uint8_t* payload, size_t length);
+    static std::string extract(const uint8_t* payload, size_t length);
     
     // Check if this looks like a TLS Client Hello
     static bool isTLSClientHello(const uint8_t* payload, size_t length);
@@ -75,7 +74,7 @@ class QUICSNIExtractor {
 public:
     // QUIC Initial packets also contain TLS Client Hello (in CRYPTO frames)
     // This is more complex as QUIC has its own framing
-    static std::optional<std::string> extract(const uint8_t* payload, size_t length);
+    static std::string extract(const uint8_t* payload, size_t length);
     
     // Check if this looks like a QUIC Initial packet
     static bool isQUICInitial(const uint8_t* payload, size_t length);
@@ -87,7 +86,7 @@ public:
 class HTTPHostExtractor {
 public:
     // Extract Host header from HTTP request
-    static std::optional<std::string> extract(const uint8_t* payload, size_t length);
+    static std::string extract(const uint8_t* payload, size_t length);
     
     // Check if this looks like an HTTP request
     static bool isHTTPRequest(const uint8_t* payload, size_t length);
@@ -99,7 +98,7 @@ public:
 class DNSExtractor {
 public:
     // Extract queried domain from DNS request
-    static std::optional<std::string> extractQuery(const uint8_t* payload, size_t length);
+    static std::string extractQuery(const uint8_t* payload, size_t length);
     
     // Check if this is a DNS query (not response)
     static bool isDNSQuery(const uint8_t* payload, size_t length);

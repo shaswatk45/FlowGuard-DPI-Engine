@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <fstream>
-#include <thread>
+#include "mingw.thread.h"
 #include <atomic>
-#include <mutex>
-#include <condition_variable>
+#include "mingw.mutex.h"
+#include "mingw.condition_variable.h"
 #include <queue>
 #include <vector>
 #include <unordered_map>
@@ -15,7 +15,6 @@
 #include <chrono>
 #include <iomanip>
 #include <algorithm>
-#include <optional>
 
 #include "pcap_reader.h"
 #include "packet_parser.h"
@@ -41,17 +40,17 @@ public:
         not_empty_.notify_one();
     }
     
-    std::optional<T> pop(int timeout_ms = 100) {
+    bool pop(T& item, int timeout_ms = 100) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (!not_empty_.wait_for(lock, std::chrono::milliseconds(timeout_ms),
                                   [this] { return !queue_.empty() || shutdown_; })) {
-            return std::nullopt;
+            return false;
         }
-        if (queue_.empty()) return std::nullopt;
-        T item = std::move(queue_.front());
+        if (queue_.empty()) return false;
+        item = std::move(queue_.front());
         queue_.pop();
         not_full_.notify_one();
-        return item;
+        return true;
     }
     
     void shutdown() {
@@ -222,11 +221,10 @@ private:
     
     void run() {
         while (running_) {
-            auto pkt_opt = input_queue_.pop(100);
-            if (!pkt_opt) continue;
+            Packet pkt;
+            if (!input_queue_.pop(pkt, 100)) continue;
             
             processed_++;
-            Packet& pkt = *pkt_opt;
             
             // Get or create flow
             FlowEntry& flow = flows_[pkt.tuple];
@@ -264,9 +262,9 @@ private:
         if (pkt.tuple.dst_port == 443 && pkt.payload_length > 5) {
             const uint8_t* payload = pkt.data.data() + pkt.payload_offset;
             auto sni = SNIExtractor::extract(payload, pkt.payload_length);
-            if (sni) {
-                flow.sni = *sni;
-                flow.app_type = sniToAppType(*sni);
+            if (!sni.empty()) {
+                flow.sni = sni;
+                flow.app_type = sniToAppType(sni);
                 flow.classified = true;
                 return;
             }
@@ -276,9 +274,9 @@ private:
         if (pkt.tuple.dst_port == 80 && pkt.payload_length > 10) {
             const uint8_t* payload = pkt.data.data() + pkt.payload_offset;
             auto host = HTTPHostExtractor::extract(payload, pkt.payload_length);
-            if (host) {
-                flow.sni = *host;
-                flow.app_type = sniToAppType(*host);
+            if (!host.empty()) {
+                flow.sni = host;
+                flow.app_type = sniToAppType(host);
                 flow.classified = true;
                 return;
             }
@@ -335,14 +333,14 @@ private:
     
     void run() {
         while (running_) {
-            auto pkt_opt = input_queue_.pop(100);
-            if (!pkt_opt) continue;
+            Packet pkt;
+            if (!input_queue_.pop(pkt, 100)) continue;
             
             // Hash to select FP
             FiveTupleHash hasher;
-            size_t fp_idx = hasher(pkt_opt->tuple) % num_fps_;
+            size_t fp_idx = hasher(pkt.tuple) % num_fps_;
             
-            fps_[fp_idx]->queue().push(std::move(*pkt_opt));
+            fps_[fp_idx]->queue().push(std::move(pkt));
             dispatched_++;
         }
     }
@@ -414,17 +412,17 @@ public:
         std::atomic<bool> output_running{true};
         std::thread output_thread([&]() {
             while (output_running || output_queue_.size() > 0) {
-                auto pkt_opt = output_queue_.pop(50);
-                if (!pkt_opt) continue;
+                Packet pkt;
+                if (!output_queue_.pop(pkt, 50)) continue;
                 
                 PcapPacketHeader phdr;
-                phdr.ts_sec = pkt_opt->ts_sec;
-                phdr.ts_usec = pkt_opt->ts_usec;
-                phdr.incl_len = pkt_opt->data.size();
-                phdr.orig_len = pkt_opt->data.size();
+                phdr.ts_sec = pkt.ts_sec;
+                phdr.ts_usec = pkt.ts_usec;
+                phdr.incl_len = pkt.data.size();
+                phdr.orig_len = pkt.data.size();
                 
                 output.write(reinterpret_cast<const char*>(&phdr), sizeof(phdr));
-                output.write(reinterpret_cast<const char*>(pkt_opt->data.data()), pkt_opt->data.size());
+                output.write(reinterpret_cast<const char*>(pkt.data.data()), pkt.data.size());
             }
         });
         
@@ -561,7 +559,9 @@ private:
                   [](const auto& a, const auto& b) { return a.second > b.second; });
         
         uint64_t total = stats_.total_packets.load();
-        for (const auto& [app, count] : sorted_apps) {
+        for (const auto& pair : sorted_apps) {
+            auto app = pair.first;
+            auto count = pair.second;
             double pct = total > 0 ? (100.0 * count / total) : 0;
             int bar = static_cast<int>(pct / 5);
             std::string bar_str(bar, '#');
@@ -577,7 +577,9 @@ private:
         // Detected SNIs
         if (!stats_.detected_snis.empty()) {
             std::cout << "\n[Detected Domains/SNIs]\n";
-            for (const auto& [sni, app] : stats_.detected_snis) {
+            for (const auto& pair : stats_.detected_snis) {
+                auto sni = pair.first;
+                auto app = pair.second;
                 std::cout << "  - " << sni << " -> " << appTypeToString(app) << "\n";
             }
         }

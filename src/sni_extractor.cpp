@@ -42,9 +42,9 @@ bool SNIExtractor::isTLSClientHello(const uint8_t* payload, size_t length) {
     return true;
 }
 
-std::optional<std::string> SNIExtractor::extract(const uint8_t* payload, size_t length) {
+std::string SNIExtractor::extract(const uint8_t* payload, size_t length) {
     if (!isTLSClientHello(payload, length)) {
-        return std::nullopt;
+        return "";
     }
     
     // Skip TLS record header (5 bytes)
@@ -64,22 +64,22 @@ std::optional<std::string> SNIExtractor::extract(const uint8_t* payload, size_t 
     offset += 32;
     
     // Session ID
-    if (offset >= length) return std::nullopt;
+    if (offset >= length) return "";
     uint8_t session_id_length = payload[offset];
     offset += 1 + session_id_length;
     
     // Cipher suites
-    if (offset + 2 > length) return std::nullopt;
+    if (offset + 2 > length) return "";
     uint16_t cipher_suites_length = readUint16BE(payload + offset);
     offset += 2 + cipher_suites_length;
     
     // Compression methods
-    if (offset >= length) return std::nullopt;
+    if (offset >= length) return "";
     uint8_t compression_methods_length = payload[offset];
     offset += 1 + compression_methods_length;
     
     // Extensions
-    if (offset + 2 > length) return std::nullopt;
+    if (offset + 2 > length) return "";
     uint16_t extensions_length = readUint16BE(payload + offset);
     offset += 2;
     
@@ -123,7 +123,7 @@ std::optional<std::string> SNIExtractor::extract(const uint8_t* payload, size_t 
         offset += extension_length;
     }
     
-    return std::nullopt;
+    return "";
 }
 
 std::vector<std::pair<uint16_t, std::string>> SNIExtractor::extractExtensions(
@@ -156,9 +156,9 @@ bool HTTPHostExtractor::isHTTPRequest(const uint8_t* payload, size_t length) {
     return false;
 }
 
-std::optional<std::string> HTTPHostExtractor::extract(const uint8_t* payload, size_t length) {
+std::string HTTPHostExtractor::extract(const uint8_t* payload, size_t length) {
     if (!isHTTPRequest(payload, length)) {
-        return std::nullopt;
+        return "";
     }
     
     // Search for "Host: " header
@@ -199,7 +199,7 @@ std::optional<std::string> HTTPHostExtractor::extract(const uint8_t* payload, si
         }
     }
     
-    return std::nullopt;
+    return "";
 }
 
 // ============================================================================
@@ -221,9 +221,9 @@ bool DNSExtractor::isDNSQuery(const uint8_t* payload, size_t length) {
     return true;
 }
 
-std::optional<std::string> DNSExtractor::extractQuery(const uint8_t* payload, size_t length) {
+std::string DNSExtractor::extractQuery(const uint8_t* payload, size_t length) {
     if (!isDNSQuery(payload, length)) {
-        return std::nullopt;
+        return "";
     }
     
     // DNS query starts at byte 12
@@ -252,8 +252,7 @@ std::optional<std::string> DNSExtractor::extractQuery(const uint8_t* payload, si
         domain += std::string(reinterpret_cast<const char*>(payload + offset), label_length);
         offset += label_length;
     }
-    
-    return domain.empty() ? std::nullopt : std::optional<std::string>(domain);
+    return domain;
 }
 
 // ============================================================================
@@ -277,13 +276,13 @@ bool QUICSNIExtractor::isQUICInitial(const uint8_t* payload, size_t length) {
     return true;
 }
 
-std::optional<std::string> QUICSNIExtractor::extract(const uint8_t* payload, size_t length) {
+std::string QUICSNIExtractor::extract(const uint8_t* payload, size_t length) {
     // QUIC Initial packets contain the TLS Client Hello inside CRYPTO frames
     // This is complex to parse properly due to QUIC framing
     // For now, we'll do a simplified search for the SNI extension pattern
     
     if (!isQUICInitial(payload, length)) {
-        return std::nullopt;
+        return "";
     }
     
     // Search for TLS Client Hello pattern within the QUIC packet
@@ -292,11 +291,11 @@ std::optional<std::string> QUICSNIExtractor::extract(const uint8_t* payload, siz
         if (payload[i] == 0x01) {  // Client Hello handshake type
             // Try to extract SNI starting from here
             auto result = SNIExtractor::extract(payload + i - 5, length - i + 5);
-            if (result) return result;
+            if (!result.empty()) return result;
         }
     }
     
-    return std::nullopt;
+    return "";
 }
 
 } // namespace DPI
