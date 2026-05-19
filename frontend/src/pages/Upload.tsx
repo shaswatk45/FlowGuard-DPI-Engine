@@ -1,20 +1,26 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PcapDropZone } from '../components/PcapDropZone';
 import { ProgressLog } from '../components/ProgressLog';
 import { SlantedPanel } from '../components/SlantedPanel';
 import { PageHeader } from '../components/PageHeader';
 import { PillButton } from '../components/PillButton';
-import { Activity, ShieldAlert, FileText, Download } from 'lucide-react';
+import { useAnalytics } from '../context/AnalyticsContext';
+import { Activity, ShieldAlert, FileText, Download, BarChart2 } from 'lucide-react';
 
 export function Upload() {
     const [file, setFile] = useState<File | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
     const [logs, setLogs] = useState<any[]>([]);
+    const [done, setDone] = useState(false);
+    const { setAnalytics } = useAnalytics();
+    const navigate = useNavigate();
 
     const handleStartAnalysis = async () => {
         if (!file) return;
         setIsProcessing(true);
+        setDone(false);
         setLogs([{ id: '1', time: new Date().toISOString().slice(11, 19), level: 'info', message: `Sending ${file.name} to Deep Packet Inspection Edge...` }]);
         setProgress(15);
 
@@ -22,26 +28,25 @@ export function Upload() {
         formData.append('pcap', file);
 
         try {
-            const response = await fetch('/api/analyze', {
-                method: 'POST',
-                body: formData,
-            });
-
+            const response = await fetch('/api/analyze', { method: 'POST', body: formData });
             setProgress(60);
             const data = await response.json();
 
             if (response.ok) {
+                // Save structured analytics to global context
+                if (data.analytics) setAnalytics(data.analytics);
+
                 setLogs(prev => [
                     ...prev,
-                    { id: '2', time: new Date().toISOString().slice(11, 19), level: 'success', message: 'Engine execution complete.' },
-                    ...data.logs
+                    { id: 'ok', time: new Date().toISOString().slice(11, 19), level: 'success', message: `✓ Analysis complete — ${data.analytics?.totalPackets ?? '?'} packets, ${data.analytics?.appBreakdown?.length ?? 0} application types detected.` },
+                    ...(data.logs || [])
                 ]);
                 setProgress(100);
+                setDone(true);
             } else {
                 setLogs(prev => [
                     ...prev,
                     { id: 'err', time: new Date().toISOString().slice(11, 19), level: 'error', message: data.error || 'Execution failed.' },
-                    ...(data.logs || [])
                 ]);
                 setProgress(0);
             }
@@ -52,6 +57,7 @@ export function Upload() {
             setIsProcessing(false);
         }
     };
+
 
     return (
         <div className="flex flex-col xl:flex-row gap-12 w-full mt-4">
@@ -108,7 +114,7 @@ export function Upload() {
                     <PcapDropZone onFileSelect={setFile} />
                 </div>
 
-                <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center gap-4 mb-12">
                     <PillButton
                         variant="primary"
                         onClick={handleStartAnalysis}
@@ -124,6 +130,19 @@ export function Upload() {
                             'EXECUTE ANALYSIS'
                         )}
                     </PillButton>
+
+                    {done && (
+                        <PillButton
+                            variant="secondary"
+                            onClick={() => navigate('/dashboard')}
+                            className="px-10 py-4 text-[14px]"
+                        >
+                            <span className="flex items-center gap-2">
+                                <BarChart2 className="w-4 h-4" />
+                                VIEW ANALYTICS
+                            </span>
+                        </PillButton>
+                    )}
                 </div>
 
                 {isProcessing || logs.length > 0 ? (
