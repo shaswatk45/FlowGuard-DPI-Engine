@@ -6,6 +6,7 @@ export function Topbar() {
 
     // Mapping old paths to new Nexus V2 nomenclature
     const tabs = [
+        { name: 'HOME', path: '/upload' },
         { name: 'RULES', path: '/rules' },
         { name: 'ANALYTICS', path: '/dashboard' },
         { name: 'NODES', path: '/traffic' },
@@ -14,7 +15,7 @@ export function Topbar() {
     return (
         <header className="fixed top-0 left-0 right-0 h-[90px] bg-page z-50 flex items-center px-10 md:px-16 border-b border-transparent">
             {/* Logo Area */}
-            <div className="flex items-center space-x-4 mr-16">
+            <Link to="/upload" className="flex items-center space-x-4 mr-16 hover:opacity-85 transition-opacity">
                 <div className="w-12 h-12 rounded-[16px] bg-white flex items-center justify-center shadow-md">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2L3 6v6.5C3 18.04 6.89 23 12 23c5.11 0 9-4.96 9-10.5V6l-9-4z" fill="#000" />
@@ -24,12 +25,12 @@ export function Topbar() {
                 <span className="text-white text-[22px] font-black tracking-tighter">
                     NEXUS.V2
                 </span>
-            </div>
+            </Link>
 
             {/* Navigation */}
             <nav className="flex h-full space-x-10">
                 {tabs.map((tab) => {
-                    const isActive = location.pathname.startsWith(tab.path) || (location.pathname === '/' && tab.path === '/rules');
+                    const isActive = location.pathname === tab.path;
                     return (
                         <Link
                             key={tab.name}
