@@ -67,3 +67,4 @@ export function RuleCard({ rule, onToggle, className }: RuleCardProps) {
         </div>
     );
 }
+ 

@@ -358,3 +358,4 @@ struct hash<mingw_stdthread::thread::id>
 };
 }
 #endif // WIN32STDTHREAD_H
+ 

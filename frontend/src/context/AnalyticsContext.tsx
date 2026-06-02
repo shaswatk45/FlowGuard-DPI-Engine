@@ -67,3 +67,4 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
 
 export const useAnalytics = () => useContext(AnalyticsContext);
 
+ 

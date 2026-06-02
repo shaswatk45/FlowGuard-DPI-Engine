@@ -37,3 +37,4 @@ export function ThreadBar({ id, type, load, className }: ThreadBarProps) {
         </div>
     );
 }
+ 

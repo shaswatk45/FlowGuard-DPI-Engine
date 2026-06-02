@@ -364,3 +364,4 @@ RuleManager::RuleStats RuleManager::getStats() const {
 }
 
 } // namespace DPI
+ 

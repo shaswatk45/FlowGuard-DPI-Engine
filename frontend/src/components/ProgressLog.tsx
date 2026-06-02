@@ -52,3 +52,4 @@ export function ProgressLog({ logs, progress, className }: ProgressLogProps) {
         </div>
     );
 }
+ 

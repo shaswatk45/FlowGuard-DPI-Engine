@@ -107,3 +107,4 @@ namespace detail
 } //  Namespace "mingw_stdthread"
 
 #endif
+ 

@@ -68,3 +68,4 @@ export function ProtocolBarChart({ data, className }: ProtocolBarChartProps) {
         </div>
     );
 }
+ 

@@ -80,3 +80,4 @@ export function FlowTable({ data }: FlowTableProps) {
         </div>
     );
 }
+ 

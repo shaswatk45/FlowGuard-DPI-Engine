@@ -38,3 +38,4 @@ export function FilterBar({ className }: FilterBarProps) {
         </div>
     );
 }
+ 

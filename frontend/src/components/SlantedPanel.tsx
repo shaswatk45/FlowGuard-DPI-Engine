@@ -20,3 +20,4 @@ export function SlantedPanel({ children, className, variant = 'blue' }: SlantedP
         </div>
     );
 }
+ 
