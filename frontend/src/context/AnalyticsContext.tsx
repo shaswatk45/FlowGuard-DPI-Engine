@@ -21,6 +21,7 @@ export interface AnalyticsData {
     dropped:      number;
     appBreakdown: AppStat[];
     detectedSNIs: SNIEntry[];
+    ruleHits?:    Record<string, number>;
     filename:     string;
     timestamp:    string;
 }

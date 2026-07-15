@@ -23,6 +23,8 @@ const upload = multer({ storage });
 
 // Global store for the last analysis
 let latestAnalysis = null;
+const analysisHistory = [];
+const MAX_HISTORY = 50;
 
 // ============================================================
 // Parse the DPI engine's text output into structured data
@@ -42,6 +44,7 @@ function parseDPIOutput(stdout, originalFilename) {
         dropped:      0,
         appBreakdown: [],
         detectedSNIs: [],
+        ruleHits:     {},
         filename:     originalFilename || 'upload.pcap',
         timestamp:    new Date().toISOString()
     };
@@ -86,6 +89,13 @@ function parseDPIOutput(stdout, originalFilename) {
                 });
             }
         }
+
+        // --- Rule hit counters e.g.: "BLOCKED 5 packets matching --block-domain facebook" ---
+        const hitMatch = line.match(/BLOCKED\s+(\d+)\s+packets?.*?(--[\w\-]+\s+[\w\.]+)/);
+        if (hitMatch) {
+            const flag = hitMatch[2].trim();
+            result.ruleHits[flag] = (result.ruleHits[flag] || 0) + parseInt(hitMatch[1], 10);
+        }
     }
 
     return result;
@@ -126,9 +136,11 @@ app.get('/api/stats', (req, res) => {
 
 // Rules
 let activeRules = [
-    { id: '1', title: 'BLOCK SUSPICIOUS EXIT NODES', description: 'Drops all packets originating from known Tor exit nodes.', tags: ['#SECURITY', '#TOR-BLOCK'], enabled: true },
-    { id: '2', title: 'THROTTLE STREAMING',           description: 'Limits video streaming to 5 Mbps during peak hours.',             tags: ['#BANDWIDTH', '#QOS'],        enabled: false },
-    { id: '3', title: 'SSH BRUTE PROTECTION',         description: 'Auto-bans IPs with 10+ failed SSH attempts in 60 s.',             tags: ['#COMPLIANCE', '#BRUTE'],     enabled: true },
+    { id: '1', title: 'BLOCK YOUTUBE', description: 'Drops all packets associated with YouTube traffic.', tags: ['#BANDWIDTH', '#BLOCK-APP'], enabled: false, flag: '--block-app YouTube', severity: 'medium' },
+    { id: '2', title: 'BLOCK FACEBOOK', description: 'Drops all packets associated with Facebook traffic.', tags: ['#BANDWIDTH', '#BLOCK-APP'], enabled: false, flag: '--block-domain facebook', severity: 'medium' },
+    { id: '3', title: 'BLOCK SUSPICIOUS IP', description: 'Blocks traffic from a specific testing IP (192.168.1.50).', tags: ['#SECURITY', '#BLOCK-IP'], enabled: false, flag: '--block-ip 192.168.1.50', severity: 'high' },
+    { id: '4', title: 'RATE LIMIT TORRENTS', description: 'Throttles BitTorrent and P2P traffic to preserve bandwidth.', tags: ['#QOS', '#BANDWIDTH'], enabled: false, flag: '--rate-limit torrent', severity: 'low' },
+    { id: '5', title: 'BLOCK MALWARE C2', description: 'Drops connections to known command-and-control domains.', tags: ['#SECURITY', '#COMPLIANCE'], enabled: false, flag: '--block-domain c2.malware.test', severity: 'critical' },
 ];
 app.get('/api/rules', (req, res) => res.json(activeRules));
 app.post('/api/rules', (req, res) => {
@@ -136,20 +148,84 @@ app.post('/api/rules', (req, res) => {
     activeRules = activeRules.map(r => r.id === id ? { ...r, enabled } : r);
     res.json({ success: true, rules: activeRules });
 });
-
-// Live traffic mock stream
-app.get('/api/traffic-stream', (req, res) => {
-    const flows = Array.from({ length: Math.floor(Math.random() * 5) + 3 }).map(() => ({
-        id:        Math.random().toString(36).substr(2, 9),
-        action:    Math.random() > 0.8 ? 'DROP' : 'ALLOW',
-        srcIp:     `192.168.1.${Math.floor(Math.random() * 255)}`,
-        dstIp:     `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.12.31`,
-        proto:     ['HTTPS/TLS','SSH/BRUTE','TCP/KEEPALIVE','DNS/UDP','ICMP/PING'][Math.floor(Math.random() * 5)],
-        size:      `${Math.floor(Math.random() * 1024)} B`,
-        timestamp: new Date().toISOString().slice(11, 23)
+app.put('/api/rules', (req, res) => {
+    const { rules } = req.body;
+    if (!Array.isArray(rules)) return res.status(400).json({ error: 'rules array required' });
+    activeRules = rules.map(r => ({
+        id: r.id || String(Date.now() + Math.random()),
+        title: r.title || 'UNNAMED RULE',
+        description: r.description || '',
+        tags: Array.isArray(r.tags) ? r.tags : [],
+        enabled: Boolean(r.enabled),
+        flag: r.flag || '',
+        severity: r.severity || 'medium',
     }));
-    res.json(flows);
+    res.json({ success: true, rules: activeRules });
 });
+// Create a new rule
+app.post('/api/rules/create', (req, res) => {
+    const { title, description, tags, severity, flag } = req.body;
+    if (!title) return res.status(400).json({ error: 'title required' });
+    const newRule = {
+        id: String(Date.now()),
+        title: title.toUpperCase(),
+        description: description || '',
+        tags: Array.isArray(tags) ? tags : [],
+        enabled: false,
+        flag: flag || '',
+        severity: severity || 'medium',
+        hits: 0,
+    };
+    activeRules.push(newRule);
+    res.json({ success: true, rule: newRule, rules: activeRules });
+});
+// Delete a rule
+app.delete('/api/rules/:id', (req, res) => {
+    const idx = activeRules.findIndex(r => r.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Rule not found.' });
+    activeRules.splice(idx, 1);
+    res.json({ success: true, rules: activeRules });
+});
+
+// Engine status for live widget
+app.get('/api/engine-status', (req, res) => {
+    res.json({
+        online: true,
+        message: 'Engine Bridge Online',
+        lastAnalysis: latestAnalysis ? {
+            filename: latestAnalysis.filename,
+            totalPackets: latestAnalysis.totalPackets,
+            dropped: latestAnalysis.dropped,
+            timestamp: latestAnalysis.timestamp,
+        } : null,
+    });
+});
+
+// Analysis history
+app.get('/api/history', (req, res) => {
+    res.json(analysisHistory.map(h => ({
+        id: h.id,
+        filename: h.filename,
+        timestamp: h.timestamp,
+        totalPackets: h.totalPackets,
+        dropped: h.dropped,
+        fileSize: h.fileSize,
+        appBreakdown: h.appBreakdown || [],
+    })));
+});
+app.get('/api/history/:id', (req, res) => {
+    const entry = analysisHistory.find(h => h.id === req.params.id);
+    if (!entry) return res.status(404).json({ error: 'History entry not found.' });
+    res.json(entry);
+});
+app.delete('/api/history/:id', (req, res) => {
+    const idx = analysisHistory.findIndex(h => h.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'History entry not found.' });
+    analysisHistory.splice(idx, 1);
+    res.json({ success: true });
+});
+
+
 
 // ============================================================
 // Main analyse endpoint
@@ -161,8 +237,14 @@ app.post('/api/analyze', upload.single('pcap'), (req, res) => {
     const outputPath = path.join(__dirname, 'uploads', `output-${Date.now()}.pcap`);
     const enginePath = path.join(__dirname, '..', 'dpi_engine.exe');
 
-    console.log(`[analyze] Running engine on ${req.file.originalname}`);
-    const cmd = `"${enginePath}" "${inputPath}" "${outputPath}"`;
+    // Build command with active rules
+    let ruleFlags = activeRules
+        .filter(r => r.enabled && r.flag)
+        .map(r => r.flag)
+        .join(' ');
+
+    console.log(`[analyze] Running engine on ${req.file.originalname} with rules: ${ruleFlags || 'none'}`);
+    const cmd = `"${enginePath}" "${inputPath}" "${outputPath}" ${ruleFlags}`;
 
     exec(cmd, (error, stdout, stderr) => {
         if (error) {
@@ -172,7 +254,23 @@ app.post('/api/analyze', upload.single('pcap'), (req, res) => {
 
         // Parse and store
         const analytics = parseDPIOutput(stdout, req.file.originalname);
-        latestAnalysis  = analytics;
+        // Merge rule hits from ruleHits map into rule flags
+        activeRules = activeRules.map(r => {
+            const hits = r.flag ? (analytics.ruleHits[r.flag] || 0) : 0;
+            return { ...r, hits };
+        });
+        analytics.ruleHits = Object.fromEntries(
+            activeRules.filter(r => r.flag).map(r => [r.flag, r.hits || 0])
+        );
+        latestAnalysis = analytics;
+
+        const historyEntry = {
+            id: String(Date.now()),
+            fileSize: req.file.size,
+            ...analytics,
+        };
+        analysisHistory.unshift(historyEntry);
+        if (analysisHistory.length > MAX_HISTORY) analysisHistory.pop();
 
         // Build log lines for the ProgressLog component
         const logs = stdout.split('\n')

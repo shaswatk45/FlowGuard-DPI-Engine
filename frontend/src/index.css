@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="dark"] {
     --bg-page: #050505;
     --bg-sidebar: #050505;
     --bg-card: #0d0d0d;
@@ -13,6 +14,9 @@
     --border-default: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.15);
     --border-focus: #2b8cee;
+    --text-primary: #ffffff;
+    --text-secondary: #A0A4A8;
+    --grid-color: rgba(255, 255, 255, 0.03);
 
     --signal-allow: #00e676;
     --signal-block: #ff4d4f;
@@ -28,14 +32,98 @@
     --gradient-cta: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
   }
 
+  [data-theme="light"] {
+    --bg-page: #f0f2f5;
+    --bg-sidebar: #e8eaed;
+    --bg-card: #ffffff;
+    --bg-card-alt: #f5f6f8;
+    --border-default: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.15);
+    --border-focus: #2563eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --grid-color: rgba(0, 0, 0, 0.04);
+
+    --signal-allow: #059669;
+    --signal-block: #dc2626;
+    --signal-warn: #d97706;
+    --signal-info: #0284c7;
+    --signal-purple: #7c3aed;
+    --signal-disabled: #9ca3af;
+
+    --accent-blue: #2563eb;
+    --accent-blue-hover: #1d4ed8;
+
+    --gradient-hero: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+    --gradient-cta: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  }
+
   body {
     @apply font-sans antialiased;
-    color: #A0A4A8;
-    /* Body text color fallback */
+    color: var(--text-secondary);
     background-color: var(--bg-page);
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
     background-size: 40px 40px;
   }
-} 
+}
+
+/* ─── Ticker marquee animation ─── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Modal slide-up animation ─── */
+@keyframes slide-up {
+  0%   { opacity: 0; transform: translateY(32px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Light mode overrides for components with hardcoded dark values ─── */
+[data-theme="light"] .animate-ticker {
+  color: var(--text-secondary);
+}
+
+/* ─── Tubelight overhead glow effect ─── */
+.tubelight-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4B8DFF, #a78bfa, #ff4d4f, #4B8DFF, transparent);
+  box-shadow: 
+    0 0 12px rgba(75, 141, 255, 0.9),
+    0 0 30px rgba(167, 139, 250, 0.7),
+    0 0 60px rgba(255, 77, 79, 0.5),
+    0 0 110px rgba(75, 141, 255, 0.3);
+  filter: blur(0.5px);
+  z-index: 10;
+}
+
+.tubelight-ambient {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-60%);
+  width: 700px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(75, 141, 255, 0.12) 0%, rgba(167, 139, 250, 0.04) 40%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}

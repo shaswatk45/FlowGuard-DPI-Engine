@@ -2,24 +2,38 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { MainLayout } from './layout/MainLayout';
 import { Upload } from './pages/Upload';
 import { Dashboard } from './pages/Dashboard';
-import { Traffic } from './pages/Traffic';
 import { Rules } from './pages/Rules';
+import { History } from './pages/History';
+import { ToastContainer } from './components/ToastContainer';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+
+function AppRoutes() {
+    const { showHelp, setShowHelp } = useKeyboardShortcuts();
+
+    return (
+        <>
+            <MainLayout>
+                <Routes>
+                    <Route path="/upload" element={<Upload />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/rules" element={<Rules />} />
+                    <Route path="/history" element={<History />} />
+                    <Route path="*" element={<Navigate to="/upload" replace />} />
+                </Routes>
+            </MainLayout>
+            <ToastContainer />
+            <KeyboardShortcutsModal open={showHelp} onClose={() => setShowHelp(false)} />
+        </>
+    );
+}
 
 function App() {
-  return (
-    <Router>
-      <MainLayout>
-        <Routes>
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/traffic" element={<Traffic />} />
-          <Route path="/rules" element={<Rules />} />
-          <Route path="*" element={<Navigate to="/upload" replace />} />
-        </Routes>
-      </MainLayout>
-    </Router>
-  );
+    return (
+        <Router>
+            <AppRoutes />
+        </Router>
+    );
 }
 
 export default App;
- 
