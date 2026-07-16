@@ -7,9 +7,7 @@ interface TickerEvent {
     color: string;
 }
 
-interface ThreatTickerProps {
-    events: TickerEvent[];
-}
+
 
 function genEvents(analytics: any): TickerEvent[] {
     if (!analytics) return [];

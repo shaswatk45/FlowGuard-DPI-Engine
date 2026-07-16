@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface DonutSlice {
     label: string;
@@ -71,7 +71,7 @@ export function DonutChart({ tcp, udp, total }: DonutChartProps) {
             <div className="relative shrink-0">
                 <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                     <defs>
-                        {slices.map((s, i) => (
+                        {slices.map((_, i) => (
                             <filter key={i} id={`glow-${i}`}>
                                 <feGaussianBlur stdDeviation="3" result="blur" />
                                 <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>

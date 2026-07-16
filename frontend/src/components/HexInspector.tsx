@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Terminal, Database, FileCode, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Terminal, CheckCircle } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface HexRow {

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, FileText, Clock, PackageSearch, TrendingUp } from 'lucide-react';
+import { Trash2, FileText, PackageSearch, TrendingUp } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 import { PillButton } from '../components/PillButton';
 import { useToast } from '../context/ToastContext';

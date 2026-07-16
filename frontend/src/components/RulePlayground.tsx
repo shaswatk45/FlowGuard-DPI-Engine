@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Shield, Play, AlertTriangle, CheckCircle, Terminal } from 'lucide-react';
+import { useState } from 'react';
+import { Shield, Play, Terminal } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 interface RuleMatchResult {

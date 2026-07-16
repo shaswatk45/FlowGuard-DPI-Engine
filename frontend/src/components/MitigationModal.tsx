@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Shield, X, Server, Wifi, CheckCircle, Cpu, Network, FileCode, Play, AlertCircle, Copy, Check } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -220,7 +220,7 @@ iptables -t nat -A PREROUTING -s ${targetInfo || '192.168.1.50'} -p tcp --dport 
             ]
         };
 
-        const activeLogs = threatLogs[threatType] || [];
+        const activeLogs = (threatLogs as any)[threatType] || [];
 
         animIntervalRef.current = setInterval(() => {
             currentProgress += 4;

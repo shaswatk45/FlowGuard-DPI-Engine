@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { cn } from '../utils/cn';
 import { useToast } from '../context/ToastContext';
-import { SlantedPanel } from '../components/SlantedPanel';
+
 import { PillButton } from '../components/PillButton';
 import { ProtocolBarChart } from '../components/ProtocolBarChart';
 import { SeverityBadge, getThreatLevel } from '../components/SeverityBadge';
 import { DonutChart } from '../components/DonutChart';
 import { ThreatGauge, computeThreatScore } from '../components/ThreatGauge';
 import { exportAnalyticsJSON, exportAnalyticsCSV, exportPDFReport } from '../utils/export';
-import { classifyDomain, getRiskInfo, RISK_META, type RiskCategory } from '../utils/sniClassifier';
+import { classifyDomain, getRiskInfo, type RiskCategory } from '../utils/sniClassifier';
 import { Upload, BarChart2, Shield, Wifi, Globe, AlertTriangle, Download, Search, FileText, CheckCircle } from 'lucide-react';
 import { MitigationModal, type ThreatType } from '../components/MitigationModal';
 import { HexInspector } from '../components/HexInspector';

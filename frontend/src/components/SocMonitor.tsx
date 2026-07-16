@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Terminal, Settings, ShieldAlert, FileOutput, Server, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, ShieldAlert, FileOutput, Server, Check } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { cn } from '../utils/cn';
 
