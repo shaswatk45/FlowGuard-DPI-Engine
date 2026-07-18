@@ -7,6 +7,7 @@ import { History } from './pages/History';
 import { ToastContainer } from './components/ToastContainer';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { AttackAlertOverlay } from './components/AttackAlertOverlay';
 
 function AppRoutes() {
     const { showHelp, setShowHelp } = useKeyboardShortcuts();
@@ -23,6 +24,7 @@ function AppRoutes() {
                 </Routes>
             </MainLayout>
             <ToastContainer />
+            <AttackAlertOverlay />
             <KeyboardShortcutsModal open={showHelp} onClose={() => setShowHelp(false)} />
         </>
     );
